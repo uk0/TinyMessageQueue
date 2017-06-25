@@ -48,7 +48,7 @@ class RequestSimulator {
 }
 
 public class MasterWorkerTest {
-    static class testHandleRequestPart1 {
+    static class testHandleRequest {
         public static void main(String[] args){
             MasterWorker master = new MasterWorker(5120);
             master.handleRequest();
@@ -68,7 +68,7 @@ public class MasterWorkerTest {
      * @-1230001x
      */
 
-    static class testHandleRequestPart2 {
+    static class testHandleRequestWithUsersInput{
         public static void main(String[] args) throws Exception{
             RequestSimulator rs = new RequestSimulator("localhost",5120);
             Scanner scan = new Scanner(System.in);
@@ -81,6 +81,18 @@ public class MasterWorkerTest {
             }
             rs.close();
         }
+    }
 
+    static class testHandleRequestWithoutUserInput{
+        public static void main(String[] args){
+            RequestSimulator rs = new RequestSimulator("localhost",5120);
+            Scanner scan = new Scanner(System.in);
+            int i = 0;
+            while (i < 100){
+                rs.sendMessage("@00020026qwertyuiopasdfghjklzxcvbnm");
+                i++;
+            }
+            rs.close();
+        }
     }
 } 
