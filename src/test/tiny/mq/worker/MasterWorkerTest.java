@@ -16,7 +16,7 @@ class RequestSimulator {
 
     private int port;
 
-    public RequestSimulator(String IP,int PORT){
+    RequestSimulator(String IP, int PORT){
         try {
             ip = IP;
             port = port;
@@ -26,7 +26,7 @@ class RequestSimulator {
         }
     }
 
-    public void sendMessage(String str){
+    void sendMessage(String str){
         try{
             out = socket.getOutputStream();
             out.write(str.getBytes());
@@ -35,7 +35,7 @@ class RequestSimulator {
         }
     }
 
-    public void close(){
+    void close(){
         try {
             out.close();
             // Closing the returned OutputStream will close the associated

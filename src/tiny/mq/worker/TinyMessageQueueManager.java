@@ -42,7 +42,7 @@ public class TinyMessageQueueManager {
     class PersistenceTask implements Runnable{
         @Override
         public void run(){
-            synchronized (this) {
+            synchronized (TinyMessageQueueManager.this) {
                 System.out.println("In persistence task");
                 Message messageObject = findMinLengthQueue().pop();
                 if (messageObject != null) {
@@ -82,20 +82,6 @@ public class TinyMessageQueueManager {
         return tmqRef;
     }
 
-    public TinyMessageQueue findMaxLengthQueue(){
-        int maxLen = tmq[0].getLength();
-
-        TinyMessageQueue tmqRef = tmq[0];
-
-        for(int i = 1; i < tmq.length; i++){
-            int curlen = tmq[i].getLength();
-            if(curlen > maxLen ){
-                maxLen = curlen;
-                tmqRef = tmq[i];
-            }
-        }
-        return tmqRef;
-    }
 
     protected void switchLogger(){
         logger = Logger.getLogger("TMQ::LOGGER");
