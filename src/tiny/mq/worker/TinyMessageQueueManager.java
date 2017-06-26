@@ -1,7 +1,7 @@
 package tiny.mq.worker;
 
 import tiny.mq.message.Message;
-import tiny.mq.message.TinyMessageQueue;
+import tiny.mq.container.TinyMessageQueue;
 import tiny.mq.utility.MessageAux;
 
 import java.io.*;
@@ -27,8 +27,9 @@ public class TinyMessageQueueManager {
             synchronized (this) {
                 try {
                     List<Message> messages = MessageAux.readMessagesFrom(task);
-                    System.out.println(messages);
+
                     for (Message message : messages){
+                        System.out.println(message);
                         findMinLengthQueue().push(message);
                     }
                 } catch (IOException e) {
@@ -42,6 +43,7 @@ public class TinyMessageQueueManager {
         @Override
         public void run(){
             synchronized (this) {
+                System.out.println("In persistence task");
                 Message messageObject = findMinLengthQueue().pop();
                 if (messageObject != null) {
                     long epoch = System.currentTimeMillis() / 1000;

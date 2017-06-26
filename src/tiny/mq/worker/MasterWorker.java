@@ -22,12 +22,22 @@ public class MasterWorker {
     }
 
     public void handleRequest(){
-        try {
-            while (true){
-                Socket socketTask = serverSocket.accept();
-                dispatcher.dispatch(socketTask);
-            }
-        } catch (IOException e) {}
+        while (true){
+            dispatcher.threadPool.execute(new Runnable() {
+                @Override
+                public void run() {
+                    Socket socketTask = null;
+                    try {
+                        socketTask = serverSocket.accept();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    dispatcher.dispatch(socketTask);
+                }
+            });
+
+            dispatcher.threadPool.execute(dispatcher.tmqManager.new PersistenceTask());
+        }
     }
 
     public int getPort(){

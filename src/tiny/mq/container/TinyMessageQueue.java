@@ -1,7 +1,9 @@
 package tiny.mq.container;
 
+import tiny.mq.container.MessageQueue;
 import tiny.mq.message.Message;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class TinyMessageQueue implements MessageQueue {
@@ -18,7 +20,13 @@ public class TinyMessageQueue implements MessageQueue {
 
     @Override
     public Message pop() {
-        return container.pop();
+        Message message = null;
+        try{
+            message  = container.pop();
+        }catch (NoSuchElementException e){
+            return message;
+        }
+        return message;
     }
 
     @Override

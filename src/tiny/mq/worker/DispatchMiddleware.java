@@ -5,8 +5,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DispatchMiddleware {
-    private ExecutorService threadPool;
-    private TinyMessageQueueManager tmqManager;
+    protected ExecutorService threadPool;
+    protected TinyMessageQueueManager tmqManager;
 
 
     public DispatchMiddleware(){
