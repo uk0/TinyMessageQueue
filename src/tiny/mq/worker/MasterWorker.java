@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 public class MasterWorker {
     public static Logger logger;
+
     private ServerSocket serverSocket;
 
     private DispatchMiddleware dispatcher;
@@ -56,5 +57,9 @@ public class MasterWorker {
         }, 3, 10, TimeUnit.MILLISECONDS);
 
         mainThreadPool.scheduleAtFixedRate(dispatcher.tmqManager.new PersistenceTask(), 2, 1, TimeUnit.SECONDS);
+    }
+
+    public int getPort(){
+        return port;
     }
 }
