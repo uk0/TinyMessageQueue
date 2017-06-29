@@ -12,7 +12,6 @@ public class DispatchMiddleware {
 
     public DispatchMiddleware(){
         tmqManager = new TinyMessageQueueManager(4);
-        tmqManager.switchLogger();
         threadPool = Executors.newCachedThreadPool();
     }
 

@@ -7,8 +7,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MasterWorker {
+    public static Logger logger;
     private ServerSocket serverSocket;
 
     private DispatchMiddleware dispatcher;
@@ -31,19 +34,21 @@ public class MasterWorker {
 
     public void configureWorker(){
         FolderAux.createFolder("msgobj");
+        logger = Logger.getLogger("TMQ::LOGGER");
+        logger.setLevel(Level.ALL);
     }
 
     public void handleRequest(){
         mainThreadPool.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                System.out.println("In socket waiting");
+                MasterWorker.logger.info("In socket waiting");
                 Socket socketTask = null;
                 try {
                     socketTask = serverSocket.accept();
                     dispatcher.dispatch(socketTask);
                 } catch (SocketTimeoutException e){
-                    System.out.println("Accept timeout");
+                    MasterWorker.logger.info("Accept timeout");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -52,9 +57,4 @@ public class MasterWorker {
 
         mainThreadPool.scheduleAtFixedRate(dispatcher.tmqManager.new PersistenceTask(), 2, 1, TimeUnit.SECONDS);
     }
-
-    public int getPort(){
-        return port;
-    }
-
 }

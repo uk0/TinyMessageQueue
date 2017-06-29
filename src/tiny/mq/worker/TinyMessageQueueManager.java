@@ -13,8 +13,6 @@ import java.util.logging.Logger;
 public class TinyMessageQueueManager {
     private TinyMessageQueue[] tmq;
 
-    private static Logger logger;
-
     class ParserMessageFromSocketAndInqueue implements Runnable{
         private Socket task;
 
@@ -33,7 +31,7 @@ public class TinyMessageQueueManager {
                         findMinLengthQueue().push(message);
                     }
                 } catch (IOException e) {
-                    logger.warning("failure to push message into queue");
+                    MasterWorker.logger.warning("failure to push message into queue");
                 }
             }
         }
@@ -53,10 +51,10 @@ public class TinyMessageQueueManager {
                         fileOutputStream.flush();
                         objectOutputStream.close();
                         fileOutputStream.close();
-                        logger.info(Thread.currentThread().getName() + " : In persistence task with "+getTotalMessageCount());
+                        MasterWorker.logger.info(Thread.currentThread().getName() + " : In persistence task with "+getTotalMessageCount());
                     } catch (IOException e) {
                         e.printStackTrace();
-                        logger.warning("failure to persist message object");
+                        MasterWorker.logger.warning("failure to persist message object");
                     }
                 }
             }
@@ -106,11 +104,5 @@ public class TinyMessageQueueManager {
             }
         }
         return tmqRef;
-    }
-
-
-    protected void switchLogger(){
-        logger = Logger.getLogger("TMQ::LOGGER");
-        logger.setLevel(Level.ALL);
     }
 }
