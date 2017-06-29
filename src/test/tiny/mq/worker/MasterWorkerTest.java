@@ -51,6 +51,7 @@ public class MasterWorkerTest {
     static class testHandleRequest {
         public static void main(String[] args){
             MasterWorker master = new MasterWorker(5120);
+            master.configureWorker();
             master.handleRequest();
         }
 

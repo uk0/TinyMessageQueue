@@ -1,13 +1,12 @@
 package tiny.mq.worker;
 
+import tiny.mq.utility.FolderAux;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class MasterWorker {
     private ServerSocket serverSocket;
@@ -23,34 +22,35 @@ public class MasterWorker {
             this.port = port;
             serverSocket = new ServerSocket(port);
             dispatcher = new DispatchMiddleware();
-            mainThreadPool = Executors.newScheduledThreadPool(3);
+            mainThreadPool = Executors.newScheduledThreadPool(10);
             serverSocket.setSoTimeout(300);
         }catch (Exception e){
             System.exit(0);
         }
     }
 
-    public void handleRequest(){
-        //while (true){
-            mainThreadPool.scheduleAtFixedRate(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("In socket waiting");
-                    Socket socketTask = null;
-                    try {
-                        socketTask = serverSocket.accept();
-                        dispatcher.dispatch(socketTask);
-                    } catch (SocketTimeoutException e){
-                        Thread.currentThread().interrupt();
-                        System.out.println("Accept timeout");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, 3, 10, TimeUnit.MILLISECONDS);
+    public void configureWorker(){
+        FolderAux.createFolder("msgobj");
+    }
 
-            mainThreadPool.scheduleAtFixedRate(dispatcher.tmqManager.new PersistenceTask(),2,10,TimeUnit.MILLISECONDS);
-        //}
+    public void handleRequest(){
+        mainThreadPool.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("In socket waiting");
+                Socket socketTask = null;
+                try {
+                    socketTask = serverSocket.accept();
+                    dispatcher.dispatch(socketTask);
+                } catch (SocketTimeoutException e){
+                    System.out.println("Accept timeout");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 3, 10, TimeUnit.MILLISECONDS);
+
+        mainThreadPool.scheduleAtFixedRate(dispatcher.tmqManager.new PersistenceTask(), 2, 300, TimeUnit.MILLISECONDS);
     }
 
     public int getPort(){

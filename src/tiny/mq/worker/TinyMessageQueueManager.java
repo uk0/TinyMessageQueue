@@ -42,15 +42,18 @@ public class TinyMessageQueueManager {
     class PersistenceTask implements Runnable{
         @Override
         public void run(){
-            synchronized (TinyMessageQueueManager.this) {
-                System.out.println("In persistence task");
-                Message messageObject = findMinLengthQueue().pop();
+            synchronized (this) {
+                Message messageObject = findMaxLengthQueue().pop();
                 if (messageObject != null) {
                     long epoch = System.currentTimeMillis() / 1000;
-                    ObjectOutputStream outputStream = null;
-                    try {
-                        outputStream = new ObjectOutputStream(new FileOutputStream("msg" + epoch));
-                        outputStream.writeObject(messageObject);
+                    try(FileOutputStream fileOutputStream = new FileOutputStream("msgobj/msg" + epoch);
+                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);) {
+                        objectOutputStream.writeObject(messageObject);
+                        objectOutputStream.flush();
+                        fileOutputStream.flush();
+                        objectOutputStream.close();
+                        fileOutputStream.close();
+                        logger.info(Thread.currentThread().getName() + " : In persistence task with "+getTotalMessageCount());
                     } catch (IOException e) {
                         e.printStackTrace();
                         logger.warning("failure to persist message object");
@@ -58,6 +61,14 @@ public class TinyMessageQueueManager {
                 }
             }
         }
+    }
+
+    synchronized public int getTotalMessageCount(){
+        int result = 0;
+        for (TinyMessageQueue tmq : tmq) {
+            result += tmq.getLength();
+        }
+        return result;
     }
 
     public TinyMessageQueueManager(int maxQueueCount){
@@ -76,6 +87,21 @@ public class TinyMessageQueueManager {
             int curlen = tmq[i].getLength();
             if(curlen < minLen ){
                 minLen = curlen;
+                tmqRef = tmq[i];
+            }
+        }
+        return tmqRef;
+    }
+
+    public TinyMessageQueue findMaxLengthQueue(){
+        int maxLen = tmq[0].getLength();
+
+        TinyMessageQueue tmqRef = tmq[0];
+
+        for(int i = 1; i < tmq.length; i++){
+            int curlen = tmq[i].getLength();
+            if(curlen > maxLen ){
+                maxLen = curlen;
                 tmqRef = tmq[i];
             }
         }
