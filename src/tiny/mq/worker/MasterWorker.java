@@ -50,7 +50,7 @@ public class MasterWorker {
             }
         }, 3, 10, TimeUnit.MILLISECONDS);
 
-        mainThreadPool.scheduleAtFixedRate(dispatcher.tmqManager.new PersistenceTask(), 2, 300, TimeUnit.MILLISECONDS);
+        mainThreadPool.scheduleAtFixedRate(dispatcher.tmqManager.new PersistenceTask(), 2, 1, TimeUnit.SECONDS);
     }
 
     public int getPort(){
